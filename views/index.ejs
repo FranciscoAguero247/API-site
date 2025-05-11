@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="public/style.css">
+    <title>Weather News</title>
+    <style>
+        
+    </style>
+</head>
+<body>
+    <% if (locals.city){ %>
+        <div class="weather-block">
+            <h2>Today</h2>
+            <h3 class="title-block">Weather Report</h3>
+            <p><%= city %></p>
+            <p id="out_icon_day"></p>
+            <p><%= temperature %> &deg; F</p>
+        </div>
+        <section class=”weather”>
+            <div class=”container”>
+              <div id=”forecast”>
+                // here we populate the 5 days forecast
+                <!--create a grid container that conatins the ejs values from the server side (e.g current forcast)
+                -->
+                <% day.forEach(day => { %>
+                <h2><%= day %></h2>
+                <% }); %>
+                
+                <% temperatureWeekForecast.forEach(temperatureWeekForecast => { %>
+                <p><%= temperatureWeekForecast %> &deg; F</p>
+                <% }); %>
+
+                <p id="out_icon_week"></p>
+
+            </div>
+        </section>          
+        <script>
+            let stringDataStr = '<%- JSON.stringify(icon) %>';
+            let iconCode = stringDataStr.replace(/['"]+/g, '');
+            out_icon_day.innerHTML="<img src=http://openweathermap.org/img/wn/"+iconCode+"@2x.png>";
+            
+            let stringIconConversionWeek = '<%- JSON.stringify(weekIcon) %>';
+            let convertedIconCode = stringIconConversionWeek.replace(/['"]+/g, '');
+            // out_icon_week.innerHTML="<img src=http://openweathermap.org/img/wn/"+convertedIconCode+"@2x.png>";
+        
+        
+        //extract str values to create five seperate values to use in img element
+            let newArr = [];
+            for (let i = 0; i < convertedIconCode.length; i++) {
+                let e = convertedIconCode[i];
+                if(e == "[" || e == "]" ){
+                    let bracket = delete e;
+                }else if (e== ",") {
+                    let comma = delete e;
+                }else{
+                    let arrStr = e;
+                    newArr.push(arrStr);
+                }
+            }
+            
+            const groupAmount = 3;
+            const result = newArr.reduce((resultArray, item, index) => { 
+            const chunkIndex = Math.floor(index/groupAmount);
+
+            if(!resultArray[chunkIndex]) {
+                resultArray[chunkIndex] = [];
+            }
+
+            resultArray[chunkIndex].push(item);
+
+            return resultArray;
+            }, []);
+
+            let convertedArrayResult = [];
+
+            for (let i = 0; i < result.length; i++) {
+                let combinedArray = result[i].join("");
+                convertedArrayResult.push(combinedArray);
+            }
+
+            for (let i = 0; i < convertedArrayResult.length; i++) {
+                const weekIconCode = convertedArrayResult[i];
+
+                console.log(weekIconCode);
+
+
+                
+                
+                // let wetherIconDiv = `<p id="out_icon_week"></p>`;
+                
+                // forcastWeek.appendChild(wetherIconDiv);
+
+                out_icon_week.innerHTML="<img src=http://openweathermap.org/img/wn/"+convertedArrayResult[i]+"@2x.png>";
+            }
+
+        </script>
+    
+    <% } else { %>
+    <h1>Enter your zipcode to get weather</h1>
+    <form action="/submit" method="post">
+        <input type="text" id="zipcode-box" name="zipcode" placeholder="Enter zipcode"><br>
+        <button type="submit" class="form-submit">Submit</button><br>
+    </form>
+     <% } %>
+</body>
+</html>
