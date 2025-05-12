@@ -80,20 +80,13 @@
                 convertedArrayResult.push(combinedArray);
             }
 
-            for (let i = 0; i < convertedArrayResult.length; i++) {
-                const weekIconCode = convertedArrayResult[i];
+            const MyList = document.getElementById("out_icon_week");
+            convertedArrayResult.forEach(item => {
+                const newListItem = document.createElement("img");
+                newListItem.src = "http://openweathermap.org/img/wn/"+item+"@2x.png";
+                out_icon_week.appendChild(newListItem);
 
-                console.log(weekIconCode);
-
-
-                
-                
-                // let wetherIconDiv = `<p id="out_icon_week"></p>`;
-                
-                // forcastWeek.appendChild(wetherIconDiv);
-
-                out_icon_week.innerHTML="<img src=http://openweathermap.org/img/wn/"+convertedArrayResult[i]+"@2x.png>";
-            }
+            })
 
         </script>
     
