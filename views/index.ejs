@@ -21,18 +21,26 @@
         <section class=”weather”>
             <div class=”container”>
               <div id=”forecast”>
-                // here we populate the 5 days forecast
-                <!--create a grid container that conatins the ejs values from the server side (e.g current forcast)
-                -->
-                <% day.forEach(day => { %>
-                <h2><%= day %></h2>
-                <% }); %>
-                
-                <% temperatureWeekForecast.forEach(temperatureWeekForecast => { %>
-                <p><%= temperatureWeekForecast %> &deg; F</p>
-                <% }); %>
+                <br>
+                <br>
+            <table border="1" >
+                <tr>
+                    <% day.forEach(day => { %>
+                    <th><%= day %></th>
+                    <% }); %>
+                </tr>
+                <tr>
+                    <% temperatureWeekForecast.forEach(temperatureWeekForecast => { %>
+                    <td><%= temperatureWeekForecast %> &deg; F</td>
+                    <% }); %>
+                </tr>
+                <tr>
+                    <% weekIcon.forEach(WeatherIcon => { %>
+                    <td><img src="https://openweathermap.org/img/wn/<%= WeatherIcon %>@2x.png" alt="Weather icon"></td>
+                    <% }); %>
+                </tr>        
+            </table>
 
-                <p id="out_icon_week"></p>
 
             </div>
         </section>          
@@ -43,51 +51,6 @@
             
             let stringIconConversionWeek = '<%- JSON.stringify(weekIcon) %>';
             let convertedIconCode = stringIconConversionWeek.replace(/['"]+/g, '');
-            // out_icon_week.innerHTML="<img src=http://openweathermap.org/img/wn/"+convertedIconCode+"@2x.png>";
-        
-        
-        //extract str values to create five seperate values to use in img element
-            let newArr = [];
-            for (let i = 0; i < convertedIconCode.length; i++) {
-                let e = convertedIconCode[i];
-                if(e == "[" || e == "]" ){
-                    let bracket = delete e;
-                }else if (e== ",") {
-                    let comma = delete e;
-                }else{
-                    let arrStr = e;
-                    newArr.push(arrStr);
-                }
-            }
-            
-            const groupAmount = 3;
-            const result = newArr.reduce((resultArray, item, index) => { 
-            const chunkIndex = Math.floor(index/groupAmount);
-
-            if(!resultArray[chunkIndex]) {
-                resultArray[chunkIndex] = [];
-            }
-
-            resultArray[chunkIndex].push(item);
-
-            return resultArray;
-            }, []);
-
-            let convertedArrayResult = [];
-
-            for (let i = 0; i < result.length; i++) {
-                let combinedArray = result[i].join("");
-                convertedArrayResult.push(combinedArray);
-            }
-
-            const MyList = document.getElementById("out_icon_week");
-            convertedArrayResult.forEach(item => {
-                const newListItem = document.createElement("img");
-                newListItem.src = "http://openweathermap.org/img/wn/"+item+"@2x.png";
-                out_icon_week.appendChild(newListItem);
-
-            })
-
         </script>
     
     <% } else { %>
