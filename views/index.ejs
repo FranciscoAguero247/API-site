@@ -5,45 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="public/style.css">
     <title>Weather News</title>
-    <style>
-        
-    </style>
 </head>
-<body>
-    <% if (locals.city){ %>
-        <div class="weather-block">
-            <h2>Today</h2>
-            <h3 class="title-block">Weather Report</h3>
-            <p><%= city %></p>
-            <p id="out_icon_day"></p>
-            <p><%= temperature %> &deg; F</p>
-        </div>
-        <section class=”weather”>
-            <div class=”container”>
-              <div id=”forecast”>
-                <br>
-                <br>
-            <table border="1" >
-                <tr>
-                    <% day.forEach(day => { %>
-                    <th><%= day %></th>
-                    <% }); %>
-                </tr>
-                <tr>
-                    <% temperatureWeekForecast.forEach(temperatureWeekForecast => { %>
-                    <td><%= temperatureWeekForecast %> &deg; F</td>
-                    <% }); %>
-                </tr>
-                <tr>
-                    <% weekIcon.forEach(WeatherIcon => { %>
-                    <td><img src="https://openweathermap.org/img/wn/<%= WeatherIcon %>@2x.png" alt="Weather icon"></td>
-                    <% }); %>
-                </tr>        
-            </table>
-
-
+<body>    
+    <video autoplay muted loop id="background-video" >
+        <source src="/public/images/clouds.mp4" type="video/mp4" >
+    </video>
+    <div class="video-container">    
+        <% if (locals.city){ %>
+            <div class="weather-block">
+                <h2>Today</h2>
+                <h3 class="title-block">Weather Report</h3>
+                <p><%= city %></p>
+                <p id="out_icon_day"></p>
+                <p><%= temperature %> &deg; F</p>
             </div>
-        </section>          
+                <section class=”weather”>
+                    <div class=”container”>
+                    <div id=”forecast”>
+                        <div>
+                            <table class="weather-forecast-week" >
+                                <tr>
+                                    <% day.forEach(day => { %>
+                                    <th><%= day %></th>
+                                    <% }); %>
+                                </tr>
+                                <tr>
+                                    <% temperatureWeekForecast.forEach(temperatureWeekForecast => { %>
+                                    <td><%= temperatureWeekForecast %> &deg; F</td>
+                                    <% }); %>
+                                </tr>
+                                <tr>
+                                    <% weekIcon.forEach(WeatherIcon => { %>
+                                    <td><img src="https://openweathermap.org/img/wn/<%= WeatherIcon %>@2x.png" alt="Weather icon"></td>
+                                    <% }); %>
+                                </tr>        
+                            </table>
+                        </div>
+                    </div>
+                </section>
+        </div>         
         <script>
             let stringDataStr = '<%- JSON.stringify(icon) %>';
             let iconCode = stringDataStr.replace(/['"]+/g, '');
@@ -54,11 +54,18 @@
         </script>
     
     <% } else { %>
-    <h1>Enter your zipcode to get weather</h1>
-    <form action="/submit" method="post">
-        <input type="text" id="zipcode-box" name="zipcode" placeholder="Enter zipcode"><br>
-        <button type="submit" class="form-submit">Submit</button><br>
-    </form>
+    <video autoplay muted loop id="background-video" >
+        <source src="/public/images/forest sunshine.mp4" type="video/mp4" >
+    </video>
+        <div class="intro-container">
+            <h1 style="color: white; background-color: green;">Enter your zipcode to get weather</h1>
+            <div class="entry-form">
+                <form action="/submit" method="post">
+                    <input type="text" id="zipcode-box" name="zipcode" placeholder="Enter zipcode" class="input-form"><br>
+                    <button type="submit" class="form-submit">Submit</button><br>
+                </form>
+            </div>
+        </div>
      <% } %>
 </body>
 </html>

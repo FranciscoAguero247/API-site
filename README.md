@@ -1,4 +1,4 @@
-A simple Weather report page built using Node JS to display weather conditions using Open Weather API.
+A simple Weather report page built using Node JS and EJS to display weather conditions using Open Weather API.
 
 Clone the repo and install the dependencies.
 https://github.com/FranciscoAguero247/API-site.git
