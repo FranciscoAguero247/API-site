@@ -30,15 +30,15 @@
                                     <% }); %>
                                 </tr>
                                 <tr>
+                                    <% weekIcon.forEach(WeatherIcon => { %>
+                                    <td><img src="https://openweathermap.org/img/wn/<%= WeatherIcon %>@2x.png" alt="Weather icon"></td>
+                                    <% }); %>
+                                </tr>
+                                <tr>
                                     <% temperatureWeekForecast.forEach(temperatureWeekForecast => { %>
                                     <td><%= temperatureWeekForecast %> &deg; F</td>
                                     <% }); %>
                                 </tr>
-                                <tr>
-                                    <% weekIcon.forEach(WeatherIcon => { %>
-                                    <td><img src="https://openweathermap.org/img/wn/<%= WeatherIcon %>@2x.png" alt="Weather icon"></td>
-                                    <% }); %>
-                                </tr>        
                             </table>
                         </div>
                     </div>
