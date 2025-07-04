@@ -14,7 +14,7 @@ app.use('/public', express.static('public'));
 app.use(bodyParser.urlencoded({ extended : true }));
 app.set("view engine", "ejs");
 
-app.get("/", (req, res) =>{
+app.get("/home", (req, res) =>{
     res.render("index.ejs");
 })
 
