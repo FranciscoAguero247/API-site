@@ -1,7 +1,12 @@
 import express from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import path from "path";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const app = express();
 const port = 3000;
 const API_KEY = "08320c34b5841d4c7f44b0de6bd6a635";
@@ -54,10 +59,7 @@ app.post("/submit", async (req, res) => {
         tempList.push(tempWeekForecast);
         iconList.push(weekForecastIcon);
     }
-    
 
-
-    
     res.render("index.ejs", {
         city : cityName, 
         temperature : convretedTemperature,
@@ -66,13 +68,14 @@ app.post("/submit", async (req, res) => {
         day: days,
         temperatureWeekForecast : tempList
         });
+});
 
-    // }catch(error){
-    //     weather = null;
-    //     error = "Error, Please try again";
-    //     res.render("index.ejs", {weather, error});
-    // }//add ejs error variable to html page
-    
+app.use((req, res, next) => {
+    res.status(404).sendFile(path.join(__dirname, 'views/page404.html'));
+});
+
+app.use((err, req, res, next) => {
+  res.status(404).sendFile(path.join(__dirname, 'views/page500.html'));
 });
 
 app.listen(port, () => {

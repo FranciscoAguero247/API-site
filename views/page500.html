@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 Internal Error</title>
+    <style>
+        #video-background{
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            min-width: 100%;
+            max-height: 100%;
+        }
+        .content {
+             position: fixed;
+             background: rgba(0, 0, 0, 0.5);
+             color: #f1f1f1;
+             width: 100%;
+             padding: 20px;
+             text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <video muted loop autoplay id="video-background">
+        <source src="/public/images/screen glitch.mp4"> 
+    </video>
+    <div class="content">
+        <h1>We messed up here and we'll fix it shortly....</h1>
+    </div>
+</body>
+</html>
