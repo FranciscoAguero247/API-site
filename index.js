@@ -1,3 +1,4 @@
+import 'dotenv/config.js';
 import express from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
@@ -9,7 +10,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
 const port = 3000;
-const API_KEY = "08320c34b5841d4c7f44b0de6bd6a635";
+const api_key = process.env.API_KEY;
+
+
 
 /**
  * retrive and convert zip code to lat and lon to get weather forecast
@@ -19,6 +22,7 @@ app.use('/public', express.static('public'));
 app.use(bodyParser.urlencoded({ extended : true }));
 app.set("view engine", "ejs");
 
+
 app.get("/", (req, res) =>{
     res.render("index.ejs");
 })
@@ -26,12 +30,12 @@ app.get("/", (req, res) =>{
 app.post("/submit", async (req, res) => {
     
     const zipCode = req.body["zipcode"];
-    const resultGeocoding = await axios.get(`http://api.openweathermap.org/geo/1.0/zip?zip=${zipCode}&appid=${API_KEY}`);
+    const resultGeocoding = await axios.get(`http://api.openweathermap.org/geo/1.0/zip?zip=${zipCode}&appid=${api_key}`);
 
     const latitude = JSON.stringify(resultGeocoding.data.lat);
     const longtitude = JSON.stringify(resultGeocoding.data.lon);
 
-    const resultWeather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longtitude}&appid=${API_KEY}`);
+    const resultWeather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longtitude}&appid=${api_key}`);
     
     const iconCode = JSON.stringify(resultWeather.data.weather[0].icon);
     const cityNameStr = JSON.stringify(resultWeather.data.name);
@@ -45,7 +49,7 @@ app.post("/submit", async (req, res) => {
     /**
      * add five day weather forecast to html page underneath weather block
      */
-    const resultForecast = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longtitude}&appid=${API_KEY}`);
+    const resultForecast = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longtitude}&appid=${api_key}`);
     let weatherList = resultForecast.data.list;
 
     let days =[];
