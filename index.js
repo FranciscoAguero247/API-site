@@ -79,7 +79,7 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  res.status(404).sendFile(path.join(__dirname, 'views/page500.html'));
+  res.status(500).sendFile(path.join(__dirname, 'views/page500.html'));
 });
 
 export default app;
