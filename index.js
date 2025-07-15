@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
 const port = 3001;
-const api_key = process.env.API_KEY;
+const api_key = process.env.OPENWEATHERMAP_API_KEY;
 
 
 
@@ -83,7 +83,6 @@ app.use((err, req, res, next) => {
 });
 
 export default app;
-app.listen(process.env.port || 2121);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
