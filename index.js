@@ -9,7 +9,7 @@ import path from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
-const port = 3001;
+const port = 3000;
 const api_key = process.env.OPENWEATHERMAP_API_KEY;
 
 
@@ -30,6 +30,11 @@ app.get("/", (req, res) =>{
 app.post("/submit", async (req, res) => {
     
     const zipCode = req.body["zipcode"];
+    if(!zipCode){
+        //return res.status(400).json({ error: "City parameter is required." });
+        return res.status(404).sendFile(path.join(__dirname, 'views/page404.html'));
+    }
+    try{
     const resultGeocoding = await axios.get(`http://api.openweathermap.org/geo/1.0/zip?zip=${zipCode}&appid=${api_key}`);
 
     const latitude = JSON.stringify(resultGeocoding.data.lat);
@@ -72,14 +77,10 @@ app.post("/submit", async (req, res) => {
         day: days,
         temperatureWeekForecast : tempList
         });
-});
-
-app.use((req, res, next) => {
-    res.status(404).sendFile(path.join(__dirname, 'views/page404.html'));
-});
-
-app.use((err, req, res, next) => {
-  res.status(500).sendFile(path.join(__dirname, 'views/page500.html'));
+    }catch(error){
+        console.error("Error fetching weather data:", error);
+        res.status(500).sendFile(path.join(__dirname, 'views/page500.html'));
+    }
 });
 
 export default app;
