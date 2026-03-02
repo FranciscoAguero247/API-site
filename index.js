@@ -1,90 +1,92 @@
 import 'dotenv/config.js';
 import express from "express";
 import axios from "axios";
-import bodyParser from "body-parser";
+import path from "path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import path from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
 const app = express();
-const port = 3000;
-const api_key = process.env.OPENWEATHERMAP_API_KEY;
+const PORT = process.env.PORT || 3000;
+const API_KEY = process.env.OPENWEATHERMAP_API_KEY;
 
-
-
-/**
- * retrive and convert zip code to lat and lon to get weather forecast
- */
-
-app.use('/public', express.static('public'));
-app.use(bodyParser.urlencoded({ extended : true }));
+// 1. "Precision" Configuration
 app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded({ extended: true }));
 
 
-app.get("/", (req, res) =>{
-    res.render("index.ejs");
-})
+const kelvinToFahrenheit = (k) => Math.round(((k - 273.15) * 1.8) + 32);
+
+const getWeatherCondition = (id) => {
+    if (id >= 200 && id < 600) return 'rain';
+    if (id >= 600 && id < 700) return 'snow';
+    if (id >= 801) return 'clouds';
+    return 'clear';
+};
+
+
+app.get("/", (req, res) => {
+    res.render("index");
+});
 
 app.post("/submit", async (req, res) => {
-    
-    const zipCode = req.body["zipcode"];
-    if(!zipCode){
-        //return res.status(400).json({ error: "City parameter is required." });
-        return res.status(404).sendFile(path.join(__dirname, 'views/page404.html'));
-    }
-    try{
-    const resultGeocoding = await axios.get(`http://api.openweathermap.org/geo/1.0/zip?zip=${zipCode}&appid=${api_key}`);
+    const { zipcode } = req.body;
 
-    const latitude = JSON.stringify(resultGeocoding.data.lat);
-    const longtitude = JSON.stringify(resultGeocoding.data.lon);
-
-    const resultWeather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longtitude}&appid=${api_key}`);
-    
-    const iconCode = JSON.stringify(resultWeather.data.weather[0].icon);
-    const cityNameStr = JSON.stringify(resultWeather.data.name);
-    const cityName = cityNameStr.replace(/['"]+/g, '');
-    /**
-     * turn icon code to image in html page
-     */
-
-    const temperature = JSON.stringify(resultWeather.data.main.temp);
-    const convretedTemperature = Math.round(((temperature - 273.15) * (9/5)) + 32);
-    /**
-     * add five day weather forecast to html page underneath weather block
-     */
-    const resultForecast = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longtitude}&appid=${api_key}`);
-    let weatherList = resultForecast.data.list;
-
-    let days =[];
-    let tempList = [];
-    let iconList = [];
-    for (let i = 0; i < weatherList.length; i += 8) {
-        const tempWeekForecast = Math.round((((weatherList[i].main.temp) - 273.15) * (9/5)) + 32);
-        const weekForecastIcon = weatherList[i].weather[0].icon;
-        let dayname = new Date(weatherList[i].dt * 1000).toLocaleDateString("en", {weekday: "long",});
-        days.push(dayname);
-        tempList.push(tempWeekForecast);
-        iconList.push(weekForecastIcon);
+ 
+    if (!zipcode) {
+        return res.status(400).render("page404", { message: "Zipcode is required" });
     }
 
-    res.render("index.ejs", {
-        city : cityName, 
-        temperature : convretedTemperature,
-        icon : iconCode,
-        weekIcon : iconList,
-        day: days,
-        temperatureWeekForecast : tempList
+    try {
+        
+        const geoRes = await axios.get(`http://api.openweathermap.org/geo/1.0/zip`, {
+            params: { zip: zipcode, appid: API_KEY }
         });
-    }catch(error){
-        console.error("Error fetching weather data:", error);
-        res.status(500).sendFile(path.join(__dirname, 'views/page500.html'));
+
+        const { lat, lon, name: cityName } = geoRes.data;
+
+        const [weatherRes, forecastRes] = await Promise.all([
+            axios.get(`https://api.openweathermap.org/data/2.5/weather`, {
+                params: { lat, lon, appid: API_KEY }
+            }),
+            axios.get(`https://api.openweathermap.org/data/2.5/forecast`, {
+                params: { lat, lon, appid: API_KEY }
+            })
+        ]);
+
+        
+        const current = weatherRes.data;
+        const forecastList = forecastRes.data.list;
+
+        
+        const dailyForecast = forecastList.filter(item => item.dt_txt.includes("12:00:00")).map(item => ({
+            day: new Date(item.dt * 1000).toLocaleDateString("en", { weekday: "long" }),
+            temp: kelvinToFahrenheit(item.main.temp),
+            icon: item.weather[0].icon
+        }));
+
+        res.render("index", {
+            city: cityName,
+            temperature: kelvinToFahrenheit(current.main.temp),
+            icon: current.weather[0].icon,
+            weatherDesc: current.weather[0].description,
+            weatherCondition: getWeatherCondition(current.weather[0].id), 
+            forecast: dailyForecast,   
+            day: dailyForecast.map(d => d.day),
+            weekIcon: dailyForecast.map(d => d.icon),
+            temperatureWeekForecast: dailyForecast.map(d => d.temp)
+        });
+
+    } catch (error) {
+        console.error("Metrological Engine Failure:", error.message);
+        res.status(error.response?.status || 500).render("page500");
     }
 });
 
-export default app;
-
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+app.listen(PORT, () => {
+    console.log(`Siege Engine active on port ${PORT}`);
 });
